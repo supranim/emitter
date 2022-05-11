@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "George Lemon"
-description   = "A starter project"
+description   = "Supranim's Event Emitter - Subscribe & listen for various events within your application"
 license       = "MIT"
 srcDir        = "src"
 
