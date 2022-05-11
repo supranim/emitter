@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="/.github/supranim-events.png" width="65px" alt="Supranim Events"><br>
+    <img src="/.github/supranim-events.png" height="65px" alt="Supranim Events"><br>
     Supranim's Event Emitter - Subscribe & listen for various events within your application
 </p>
 
