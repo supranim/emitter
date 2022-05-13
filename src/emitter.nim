@@ -31,8 +31,8 @@ type
         ## available as a Singleton as ``Event``
         events: Table[string, seq[Listener]]
 
-when defined(threads):
-    var Event*{.threadvar.} = EventEmitter()
+when compileOption("threads"):
+    var Event* {.threadvar.}: EventEmitter
 else:
     var Event* = EventEmitter()
 
