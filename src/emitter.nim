@@ -46,11 +46,18 @@ template newArg*(argValue: auto): untyped =
     vany = toAny(val)
     initNewArg(vany)
 
-template listen*[E: EventEmitter](emitter: var E, key: string, handler: Callback): untyped =
-    ## Subscribe to a specific event with a runnable callback.
+proc registerListener[E: EventEmitter](emitter: var E, key: string, handler: Callback, runType: RunType) =
     if not emitter.events.hasKey(key):
         emitter.events[key] = newSeq[Listener]()
     emitter.events[key].add (id: key, runCallable: handler, runType: Anytime)
+
+template listen*[E: EventEmitter](emitter: var E, key: string, handler: Callback): untyped =
+    ## Subscribe to a specific event with a runnable callback.
+    registerListener(emitter, key, handler, Anytime)
+
+template listenOnce*[E: EventEmitter](emitter: var E, key: string, handler: Callback): untyped =
+    ## Subcribe only ``Once`` to specified event with a runnable callback
+    registerListener(emitter, key, handler, Once)
 
 template emit*[E: EventEmitter](emitter: var E, id: string, args: varargs[Arg] = @[]):untyped =
     ## Trigger an event by ``id`` and run current callable with available arguments.
