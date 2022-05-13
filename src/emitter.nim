@@ -13,6 +13,8 @@
 #          https://supranim.com
 
 import std/[tables, macros, typeinfo]
+from std/strutils import count, startsWith
+
 export tables, typeinfo
 
 type
@@ -29,7 +31,9 @@ type
     EventEmitter = object
         ## Main object that holds all events and listeners,
         ## available as a Singleton as ``Event``
-        events: Table[string, seq[Listener]]
+        subscribers: Table[string, seq[Listener]]
+
+    EventEmitterError = object of CatchableError
 
 when compileOption("threads"):
     var Event* {.threadvar.}: EventEmitter
@@ -48,22 +52,26 @@ template newArg*(argValue: auto): untyped =
     initNewArg(vany)
 
 proc registerListener[E: EventEmitter](emitter: var E, key: string, handler: Callback, runType: RunType) =
-    if not emitter.events.hasKey(key):
-        emitter.events[key] = newSeq[Listener]()
-    emitter.events[key].add (id: key, runCallable: handler, runType: Anytime)
+    ## Main proc for registering listeners to a specific events by ``key``.
+    ## TODO allow only lowercase keys, separated by dot, e.g. "user.update.account"
+    # if count(listener.id, '*') != 1:
+    #     raise newException(EventEmitterError, "A key cannot contain more than one wildcard") # for now
+    if not emitter.subscribers.hasKey(key):
+        emitter.subscribers[key] = newSeq[Listener]()
+    emitter.subscribers[key].add (id: key, runCallable: handler, runType: runType)
 
 template listen*[E: EventEmitter](emitter: var E, key: string, handler: Callback): untyped =
     ## Subscribe to a specific event with a runnable callback.
     ##
     ## You may want to register a listener using the ``*``
-    ## as a wildcard for ``key`` parameter. This allows you to catch
+    ## as a wildcard for ``key`` parameter. This allows you to
     ## register same listener to multiple events.
     runnableExamples:
         Event.listen("account.update.email") do(args: varargs[Arg]):
             echo "Email address has been changed."
 
-        Event.listen("account.update.*") do(args: varargs[Arg]):
-            echo "Listening for any events related to `account.update`"
+        Event.listen("account.*") do(args: varargs[Arg]):
+            echo "Listening for any events related to `account.`"
 
     registerListener(emitter, key, handler, Anytime)
 
@@ -72,15 +80,25 @@ template listenOnce*[E: EventEmitter](emitter: var E, key: string, handler: Call
     ## that this listener can run only once
     registerListener(emitter, key, handler, Once)
 
-template emit*[E: EventEmitter](emitter: var E, id: string, args: varargs[Arg] = @[]):untyped =
+template emit*[E: EventEmitter](emitter: var E, eventId: string, args: varargs[Arg] = @[]): untyped =
     ## Call an event by ``id`` and trigger all registered listeners
     ## related to the event. You can pass one or more ``args``
     ## to listener callback using the ``newArg`` procedure.
     runnableExamples:
         Event.emit("account.update.email", newArg("new.address@example.com"), newArg("192.168.1.1"))
 
-    if emitter.events.hasKey(id):
-        for key, listener in pairs(emitter.events[id]):
+    if emitter.subscribers.hasKey(eventId):
+        for i, listener in pairs(emitter.subscribers[eventId]):
             listener.runCallable(args)
-            if listener.runType == Once:
-                emitter.events[id].delete(key)
+            if likely(listener.runType == Once):
+                emitter.subscribers[eventId].delete(i)
+    else:
+        for subId, event in pairs(emitter.subscribers):
+            if likely(subId[^1] == '*'):
+                for i, listener in pairs(emitter.subscribers[subId]):
+                    if startsWith(eventId, subId[0 .. ^2]):
+                        listener.runCallable(args)
+                    if likely(listener.runType == Once):
+                        emitter.subscribers[subId].delete(i)
+                    else: continue
+            else: continue
