@@ -1,10 +1,11 @@
 <p align="center">
-    <img src="/.github/supranim-emitter.png" height="65px" alt="Supranim Events Emitter"><br>
+    <img src="https://raw.githubusercontent.com/supranim/emitter/main/.github/supranim-emitter.png" height="65px" alt="Supranim Events Emitter"><br>
     Supranim's Event Emitter - Subscribe & listen for various events within your application
 </p>
 
 ## ✨ Key features
 - [x] Framework Agnostic
+- [x] Available in ⚡️ [Supranim Framework](https://github.com/supranim/supranim)
 - [x] Dependency-free
 - [x] Open Source | `MIT` License
 
