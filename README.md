@@ -4,7 +4,34 @@
 </p>
 
 ## ✨ Key features
+- [x] Framework Agnostic
+- [x] Dependency-free
 - [x] Open Source | `MIT` License
+
+## Install
+```bash
+nimble install emitter
+```
+
+## Examples
+
+Using Emitter from your Supranim Application
+```nim
+# todo
+```
+
+Using Emitter from any project
+```nim
+
+# somewhere in your main application
+Event.listen("account.email.changed") do(args: varargs[Arg]):
+    echo "Email address has been changed."
+    # do the do, send confirmation mails, etc...
+
+# somewhere in your proc-based ``POST`` or ``UPDATE`` controller
+let newEmailAddress = "new.address@example.com"
+Event.emit("account.email.changed", newArg(newEmailAddress))
+```
 
 ### ❤ Contributions
 If you like this project you can contribute to Tim project by opening new issues, fixing bugs, contribute with code, ideas and you can even [donate via PayPal address](https://www.paypal.com/donate/?hosted_button_id=RJK3ZTDWPL55C) 🥰
