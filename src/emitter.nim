@@ -37,7 +37,8 @@ else:
     var Event* = EventEmitter()
 
 template newArg*(argValue: auto): untyped =
-    ## Create a new Arg object instance based on ``Any`` value
+    ## Create a new Arg object instance based on
+    ## ``Any`` value from ``std/typeinfo``
     var
         vany: Any
         val = argValue
@@ -53,14 +54,31 @@ proc registerListener[E: EventEmitter](emitter: var E, key: string, handler: Cal
 
 template listen*[E: EventEmitter](emitter: var E, key: string, handler: Callback): untyped =
     ## Subscribe to a specific event with a runnable callback.
+    ##
+    ## You may want to register a listener using the ``*``
+    ## as a wildcard for ``key`` parameter. This allows you to catch
+    ## register same listener to multiple events.
+    runnableExamples:
+        Event.listen("account.update.email") do(args: varargs[Arg]):
+            echo "Email address has been changed."
+
+        Event.listen("account.update.*") do(args: varargs[Arg]):
+            echo "Listening for any events related to `account.update`"
+
     registerListener(emitter, key, handler, Anytime)
 
 template listenOnce*[E: EventEmitter](emitter: var E, key: string, handler: Callback): untyped =
-    ## Subcribe only ``Once`` to specified event with a runnable callback
+    ## Same as ``listen`` proc, the only difference is
+    ## that this listener can run only once
     registerListener(emitter, key, handler, Once)
 
 template emit*[E: EventEmitter](emitter: var E, id: string, args: varargs[Arg] = @[]):untyped =
-    ## Trigger an event by ``id`` and run current callable with available arguments.
+    ## Call an event by ``id`` and trigger all registered listeners
+    ## related to the event. You can pass one or more ``args``
+    ## to listener callback using the ``newArg`` procedure.
+    runnableExamples:
+        Event.emit("account.update.email", newArg("new.address@example.com"), newArg("192.168.1.1"))
+
     if emitter.events.hasKey(id):
         for key, listener in pairs(emitter.events[id]):
             listener.runCallable(args)
