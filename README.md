@@ -15,8 +15,10 @@ nimble install emitter
 ```
 
 ## Examples
+Listeners can receive data as `varargs[Arg]` objects, containing a public `value` field of `Any` object. [Check std/typeinfo](https://nim-lang.org/docs/typeinfo.html#Any)
 
-Using Emitter from any project (framework agnostic)
+### Framework agnostic usage
+
 ```nim
 
 # somewhere in your main application
@@ -29,13 +31,14 @@ let newEmailAddress = "new.address@example.com"
 Event.emit("account.email.changed", newArg(newEmailAddress))
 ```
 
-Use Emitter from your Supranim app (for apps based on [Supranim Application Template](https://github.com/supranim/app)).
-All listeners should be stored inside `events/listeners`.
+### Emitter from Supranim
+For apps based on [Supranim Application Template](https://github.com/supranim/app).
+Note that all listeners should be stored inside `events/listeners` directory.
 
 In Supranim is highly recommended to create a `.nim` file for each branch of your application logic.
 For example, `account.nim` should hold all listeners related to accounts (email updates, password reset requests and so on).
 
-Note that for adding new `.nim` listeners is recommended to use `include`, not `import`. Listener files can be included
+For loading listeners into your application is recommended to use `include`, instead of `import`. Listener files can be included
 in the main state of your application (this is usually the main `.nim` file of your project.)
 
 _TODO. Create new listeners using `Sup`, the Command Line Interface of your Supranim application_
