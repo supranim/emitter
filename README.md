@@ -16,12 +16,7 @@ nimble install emitter
 
 ## Examples
 
-Using Emitter from your Supranim Application
-```nim
-# todo
-```
-
-Using Emitter from any project
+Using Emitter from any project (framework agnostic)
 ```nim
 
 # somewhere in your main application
@@ -33,6 +28,31 @@ Event.listen("account.email.changed") do(args: varargs[Arg]):
 let newEmailAddress = "new.address@example.com"
 Event.emit("account.email.changed", newArg(newEmailAddress))
 ```
+
+Use Emitter from your Supranim app (for apps based on [Supranim Application Template](https://github.com/supranim/app)).
+All listeners should be stored inside `events/listeners`.
+
+In Supranim is highly recommended to create a `.nim` file for each branch of your application logic.
+For example, `account.nim` should hold all listeners related to accounts (email updates, password reset requests and so on).
+
+Note that for adding new `.nim` listeners is recommended to use `include`, not `import`. Listener files can be included
+in the main state of your application (this is usually the main `.nim` file of your project.)
+
+_TODO. Create new listeners using `Sup`, the Command Line Interface of your Supranim application_
+
+```nim
+# src/events/listeners/account.nim
+
+Event.listen("account.email.update") do(args: varargs[Arg]):
+    echo "The email address has been changed."
+
+Event.listen("account.password.reset.request") do(args: varargs[Arg]):
+    echo "Request for password reset."
+
+Event.listen("account.password.update") do(args: varargs[Arg]):
+    echo "Password has been changed."
+```
+
 
 ### ❤ Contributions
 If you like this project you can contribute to Tim project by opening new issues, fixing bugs, contribute with code, ideas and you can even [donate via PayPal address](https://www.paypal.com/donate/?hosted_button_id=RJK3ZTDWPL55C) 🥰
