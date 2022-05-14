@@ -6,6 +6,7 @@
 ## ✨ Key features
 - [x] Framework Agnostic
 - [x] Available in ⚡️ [Supranim Framework](https://github.com/supranim/supranim)
+- [ ] Persistent Memory w/ Supranim Storage driver
 - [x] Dependency-free
 - [x] Open Source | `MIT` License
 
