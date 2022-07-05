@@ -38,7 +38,10 @@ type
 when compileOption("threads"):
     var Event* {.threadvar.}: EventEmitter
 else:
-    var Event* = EventEmitter()
+    var Event* = EventEmitter
+
+proc init*[E: EventEmitter](e: var E) =
+    Event = EventEmitter()
 
 template newArg*(argValue: auto): untyped =
     ## Create a new Arg object instance based on
