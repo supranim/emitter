@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.1.2"
+version       = "0.2.0"
 author        = "Supranim"
 description   = "Supranim's Event Emitter - Subscribe & listen for events"
 license       = "MIT"
@@ -9,12 +9,15 @@ srcDir        = "src"
 
 # Dependencies
 
-requires "nim >= 1.4.0"
-requires "libevent"
-requires "flatty"
+requires "nim >= 2.0.0"
+requires "threading >= 0.1.0"
+requires "openparser >= 0.1.4"
 
-task docgen, "Generate API documentation":
-    exec "nim doc --project --index:on --outdir:htmldocs src/emitter.nim"
+when defined(supraNative):
+  requires "powpow >= 0.1.4"
+else:
+  requires "libevent >= 0.1.2"
 
-task tests, "Run tests":
-    exec "testament p 'tests/*.nim'"
+task test, "Run all tests":
+  exec "nim c -r tests/test_libevent.nim"
+  exec "nim c -r -d:supraNative tests/test_powpow.nim"
