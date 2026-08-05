@@ -9,7 +9,7 @@ import std/[tables, strutils, sequtils, typeinfo, options, locks]
 
 import pkg/openparser/fbe
 
-when defined(supraNative):
+when defined(features.emitter.powpow):
   import pkg/powpow
 else:
   import pkg/libevent/bindings/event
@@ -38,7 +38,7 @@ type
     pending: seq[QueuedEmit]
     nextToken: uint64
     lock: Lock
-    when defined(supraNative):
+    when defined(features.emitter.powpow):
       loop*: Loop
       tickTimer: TimerId
     else:
@@ -159,7 +159,7 @@ proc emit*(emitter: var EventEmitter|ptr EventEmitter, eventId: string, args: Op
 proc emitNow*(emitter: var EventEmitter|ptr EventEmitter, eventId: string, args: Option[Args] = none(Args)) =
   emitter.dispatchNow(eventId, args)
 
-when defined(supraNative):
+when defined(features.emitter.powpow):
   include emitter/emitter_powpow
 else:
   include emitter/emitter_libevent
